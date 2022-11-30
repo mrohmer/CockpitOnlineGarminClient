@@ -10,12 +10,10 @@ class CarreraLiveRaceDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onNextPage() as Boolean {
-        System.println("next page");
         view.handlePageChange(1);
         return true;
     }
     function onPreviousPage() as Boolean {
-        System.println("previous page");
         view.handlePageChange(-1);
         return true;
     }
