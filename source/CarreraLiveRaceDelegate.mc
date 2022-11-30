@@ -2,33 +2,21 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 class CarreraLiveRaceDelegate extends WatchUi.BehaviorDelegate {
+    private var view as CarreraLiveRaceView;
 
-    function initialize() {
+    function initialize(_view as CarreraLiveRaceView) {
         BehaviorDelegate.initialize();
+        view = _view;
     }
 
-    function onSelect() {
-        return self.onMenu();
+    function onNextPage() as Boolean {
+        System.println("next page");
+        view.handlePageChange(1);
+        return true;
     }
-    function onMenu() as Boolean {
-        try {
-            var menu = new WatchUi.Menu2({:title => "Slots"});
-
-            for (var i = 0; i < 6; i++) {
-                menu.addItem(new MenuItem(
-                    "Fahrer " + (i + 1),
-                    "Slot" + (i + 1),
-                    "slot_" + (i + 1),
-                    {}
-                ));
-            }
-
-
-            WatchUi.pushView(menu, new CarreraLiveRaceMenuDelegate(), WatchUi.SLIDE_UP);
-            return true;
-        } catch (ex) {
-            System.println(ex);
-            return true;
-        }
+    function onPreviousPage() as Boolean {
+        System.println("previous page");
+        view.handlePageChange(-1);
+        return true;
     }
 }

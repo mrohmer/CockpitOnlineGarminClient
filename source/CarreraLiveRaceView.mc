@@ -3,8 +3,12 @@ import Toybox.WatchUi;
 import Toybox.System;
 import Toybox.Communications;
 import Toybox.Lang;
+import Toybox.Application.Properties;
 
 class CarreraLiveRaceView extends WatchUi.View {
+
+    private var page = 0;
+    private var data as Lang.Dictionary or Null;
 
     function initialize() {
         View.initialize();
@@ -12,7 +16,7 @@ class CarreraLiveRaceView extends WatchUi.View {
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
-        setLayout(Rez.Layouts.MainLayout(dc));
+        setLayout(Rez.Layouts.RaceLayout(dc));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -34,17 +38,81 @@ class CarreraLiveRaceView extends WatchUi.View {
     function onHide() as Void {
     }
 
+    function handleSettingsUpdate() {
+        self.makeRequest();
+    }
+    function handlePageChange(diff as Number) {
+        page = calcPage(diff, getSlots().size());
+        paint();
+    }
+    private function getSlots() as Lang.Array {
+        if (data != null and data.hasKey("slots") and data.get("slots") != null) {
+            return data.get("slots") as Lang.Array;
+        }
+        return [];
+    }
+    private function calcPage(diff as Number, maxPages as Number) as Number {
+        var p = page + diff;
+        if (p < 0) {
+            p = maxPages - 1;
+        } else if (p >= maxPages) {
+            p = 0;
+        }
+
+        return p;
+    }
+
+    private function paint() {
+        if (getSlots().size() > 0) {
+            paintSlot();
+        }
+
+        WatchUi.requestUpdate();
+    }
+    private function paintSlot() {
+        var slot = getSlots()[page] as Lang.Dictionary;
+
+        var car = slot.get("car") as Lang.Dictionary;
+
+        System.println(slot);
+        setText("name", slot.get("name"));
+        setText("car", car.get("name"));
+
+        var gas = ((slot.get("remainingGas") as Lang.Float) * 100) as Lang.Number;
+        System.println(gas);
+        var gasEl = View.findDrawableById("gas") as GasDrawable;
+        gasEl.setPercentage(gas / (slot.get("position") as Lang.Number));
+    
+    }
+
+    private function setText(id as String, text as String or Null) {
+        if (text == null) {
+            text = "";
+        }
+
+        var el = View.findDrawableById(id) as WatchUi.Text;
+        el.setText(text);
+    }
+
     // set up the response callback function
-    function onReceive(responseCode as Number, data as Null or Lang.Dictionary or Lang.String) as Void {
+    function onReceive(responseCode as Number, _data as Null or Lang.Dictionary or Lang.String) as Void {
         if (responseCode == 200) {
             System.println("Request Successful");                   // print success
+            System.println(_data);
+            data = _data.get("data");
+            handlePageChange(0);
+            paint();
         } else {
             System.println("Response: " + responseCode);            // print response code
+            data = null;
+            page = 0;
         }
     }
 
     function makeRequest() as Void {
-        var url = "https://carrera-live.rohmer.rocks/api/sessions/cma22";
+        var sessionName = Properties.getValue("sessionName");
+        System.println(sessionName);
+        var url = "https://carrera-live.rohmer.rocks/api/sessions/";
 
         var options = {                                             // set the options
             :method => Communications.HTTP_REQUEST_METHOD_GET,      // set HTTP method
@@ -53,6 +121,6 @@ class CarreraLiveRaceView extends WatchUi.View {
 
         // onReceive() method
         // Make the Communications.makeWebRequest() call
-        Communications.makeWebRequest(url, null, options, method(:onReceive));
+        Communications.makeWebRequest(url + sessionName, null, options, method(:onReceive));
     }
 }
