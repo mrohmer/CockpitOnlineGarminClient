@@ -116,13 +116,13 @@ class CarreraLiveRaceView extends WatchUi.View {
             handlePageChange(0);
             paint();
 
-            timer.start(method(:timerCallback), 1000, false);
+            scheduleFetch(1);
         } else {
             System.println("Response: " + responseCode);            // print response code
             data = null;
             page = 0;
 
-            timer.start(method(:timerCallback), 5000, false);
+            scheduleFetch(5);
         }
     }
 
@@ -138,5 +138,13 @@ class CarreraLiveRaceView extends WatchUi.View {
         // onReceive() method
         // Make the Communications.makeWebRequest() call
         Communications.makeWebRequest(url + sessionName, null, options, method(:onReceive));
+    }
+
+    function scheduleFetch(sec as Lang.Number) {
+        if (timer != null) {
+            timer.stop();
+        }
+        timer = new Timer.Timer();
+        timer.start(method(:timerCallback), sec * 1000, false);
     }
 }
