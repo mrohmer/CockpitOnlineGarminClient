@@ -1,7 +1,7 @@
 <layout id="RaceLayout">
     <drawable id="gas" class="GasDrawable" />
     <label id="position" x="center" y="30%" color="Graphics.COLOR_WHITE" font="Gfx.FONT_SYSTEM_LARGE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
-    <label id="name" x="center" y="44%" color="Graphics.COLOR_WHITE" font="Gfx.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER" />
+    <label id="name" x="center" y="45%" color="Graphics.COLOR_WHITE" font="Gfx.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER" />
     <label id="car" x="center" y="57%" color="Graphics.COLOR_LT_GRAY" font="Gfx.FONT_XTINY" justification="Graphics.TEXT_JUSTIFY_CENTER" />
     <label id="error" x="center" y="center" color="Graphics.COLOR_RED" font="Gfx.FONT_LARGE" text="!" visible="false" justification="Graphics.TEXT_JUSTIFY_CENTER" />
 </layout>
