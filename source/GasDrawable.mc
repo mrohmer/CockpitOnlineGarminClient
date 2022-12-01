@@ -11,6 +11,9 @@ class GasDrawable extends WatchUi.Drawable {
     }
 
     function draw(dc as Dc) as Void {
+        if (!isVisible) {
+            return;
+        }
         drawBorder(dc);
         drawPercentageOverlay(dc);
     }

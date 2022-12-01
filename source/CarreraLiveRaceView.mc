@@ -11,6 +11,9 @@ class CarreraLiveRaceView extends WatchUi.View {
     private var page = 0;
     private var data as Lang.Dictionary or Null;
     private var timer as Timer.Timer or Null;
+    private var loading = true;
+    private var progressbar as WatchUi.ProgressBar or Null;
+    private var error as Lang.Number or Null;
 
     function initialize() {
         View.initialize();
@@ -25,6 +28,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() as Void {
+        paint();
         self.makeRequest();
     }
 
@@ -44,6 +48,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     }
 
     function handleSettingsUpdate() {
+        loading = true;
         self.makeRequest();
     }
     function handlePageChange(diff as Number) {
@@ -68,6 +73,32 @@ class CarreraLiveRaceView extends WatchUi.View {
     }
 
     private function paint() {
+        if (loading) {
+            if (progressbar == null) {
+                progressbar = new WatchUi.ProgressBar(
+                    "lädt...",
+                    null
+                );
+                WatchUi.pushView(progressbar, null, WatchUi.SLIDE_DOWN);
+            }
+            return;
+        }
+
+        setVisible("error", error != null);
+        setVisible("position", error == null);
+        setVisible("name", error == null);
+        setVisible("car", error == null);
+        setVisible("gas", error == null);
+
+        var errorEl = View.findDrawableById("error") as WatchUi.Text;
+        errorEl.setVisible(error != null);
+        
+        if (progressbar != null) {
+            WatchUi.popView(WatchUi.SLIDE_UP);
+            progressbar = null;
+            // todo remove progressbar
+        }
+
         if (getSlots().size() > 0) {
             paintSlot();
         }
@@ -96,6 +127,10 @@ class CarreraLiveRaceView extends WatchUi.View {
         var el = View.findDrawableById(id) as WatchUi.Text;
         el.setText(text);
     }
+    private function setVisible(id as String, visible as Boolean) {
+        var el = View.findDrawableById(id) as WatchUi.Drawable;
+        el.setVisible(visible);
+    }
 
     function timerCallback() as Void {
         timer = null;
@@ -103,30 +138,31 @@ class CarreraLiveRaceView extends WatchUi.View {
     }
 
     // set up the response callback function
-    function onReceive(responseCode as Number, _data as Null or Lang.Dictionary or Lang.String) as Void {
-        if (timer != null) {
-            timer.stop();
-        }
-        timer = new Timer.Timer();
-
+    function onResponseReceive(responseCode as Number, _data as Null or Lang.Dictionary or Lang.String) as Void {
         if (responseCode == 200) {
             System.println("Request Successful");                   // print success
             System.println(_data);
+            loading = false;
+            error = null;
             data = _data.get("data");
             handlePageChange(0);
             paint();
 
             scheduleFetch(1);
         } else {
-            System.println("Response: " + responseCode);            // print response code
+            System.println("Response Code: " + responseCode);            // print response code
             data = null;
+            error = responseCode;
             page = 0;
+
+            paint();
 
             scheduleFetch(5);
         }
     }
 
     function makeRequest() as Void {
+
         var sessionName = Properties.getValue("sessionName");
         var url = "https://carrera-live.rohmer.rocks/api/sessions/";
 
@@ -135,9 +171,7 @@ class CarreraLiveRaceView extends WatchUi.View {
             :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
         };
 
-        // onReceive() method
-        // Make the Communications.makeWebRequest() call
-        Communications.makeWebRequest(url + sessionName, null, options, method(:onReceive));
+        Communications.makeWebRequest(url + sessionName, null, options, method(:onResponseReceive));
     }
 
     function scheduleFetch(sec as Lang.Number) {
