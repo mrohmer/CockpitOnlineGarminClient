@@ -79,13 +79,13 @@ class CarreraLiveRaceView extends WatchUi.View {
 
         var car = slot.get("car") as Lang.Dictionary;
 
+        setText("position", slot.get("position") + ".");
         setText("name", slot.get("name"));
         setText("car", car.get("name"));
 
         var gas = ((slot.get("remainingGas") as Lang.Float) * 100) as Lang.Number;
         var gasEl = View.findDrawableById("gas") as GasDrawable;
-        gasEl.setPercentage(gas / (slot.get("position") as Lang.Number));
-    
+        gasEl.setPercentage(gas);
     }
 
     private function setText(id as String, text as String or Null) {
