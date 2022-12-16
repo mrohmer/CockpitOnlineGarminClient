@@ -14,6 +14,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     private var loading = true;
     private var progressbar as WatchUi.ProgressBar or Null;
     private var error as Lang.Number or Null;
+    private var notifiers as Lang.Dictionary or Null;
 
     function initialize() {
         View.initialize();
@@ -28,7 +29,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     // the state of this View and prepare it to be shown. This includes
     // loading resources into memory.
     function onShow() as Void {
-        paint();
+        onDataChange();
         self.makeRequest();
     }
 
@@ -53,7 +54,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     }
     function handlePageChange(diff as Number) {
         page = calcPage(diff, getSlots().size());
-        paint();
+        onDataChange();
     }
     private function getSlots() as Lang.Array {
         if (data != null and data.hasKey("slots") and data.get("slots") != null) {
@@ -72,7 +73,7 @@ class CarreraLiveRaceView extends WatchUi.View {
         return p;
     }
 
-    private function paint() {
+    private function onDataChange() {
         if (loading) {
             if (progressbar == null) {
                 progressbar = new WatchUi.ProgressBar(
@@ -103,6 +104,8 @@ class CarreraLiveRaceView extends WatchUi.View {
             paintSlot();
         }
 
+        notifyOnEmptyGas();
+
         WatchUi.requestUpdate();
     }
     private function paintSlot() {
@@ -132,6 +135,32 @@ class CarreraLiveRaceView extends WatchUi.View {
         el.setVisible(visible);
     }
 
+    private function notifyOnEmptyGas() {
+        if (getSlots().size() == 0) {
+            return;
+        }
+
+        if (notifiers == null) {
+            notifiers = {};
+        }
+
+        for(var i = 0; i < getSlots().size(); i++) {
+            var slot = getSlots()[i];
+            var id = slot.get("id") as Lang.Number;
+            if (!notifiers.hasKey(id)) {
+                notifiers.put(id, new CarreraLiveRaceNotifier());
+            }
+            var notifier = notifiers.get(id) as CarreraLiveRaceNotifier;
+
+            var remainingGas = slot.get("remainingGas") as Lang.Float;
+            if (remainingGas < 0.1) {
+                notifier.notify(page != i);
+            } else {
+                notifier.reset();
+            }
+        }
+    }
+
     function timerCallback() as Void {
         timer = null;
         makeRequest();
@@ -146,7 +175,7 @@ class CarreraLiveRaceView extends WatchUi.View {
             error = null;
             data = _data.get("data");
             handlePageChange(0);
-            paint();
+            onDataChange();
 
             scheduleFetch(1);
         } else {
@@ -155,7 +184,7 @@ class CarreraLiveRaceView extends WatchUi.View {
             error = responseCode;
             page = 0;
 
-            paint();
+            onDataChange();
 
             scheduleFetch(5);
         }
