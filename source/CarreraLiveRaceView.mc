@@ -58,7 +58,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     }
     private function getSlots() as Lang.Array {
         if (data != null and data.hasKey("slots") and data.get("slots") != null) {
-            return data.get("slots") as Lang.Array;
+            return sortSlots(data.get("slots") as Lang.Array);
         }
         return [];
     }
@@ -209,5 +209,28 @@ class CarreraLiveRaceView extends WatchUi.View {
         }
         timer = new Timer.Timer();
         timer.start(method(:timerCallback), sec * 1000, false);
+    }
+
+    function sortSlots(slots as Lang.Array<Lang.Dictionary>) as Lang.Array<Lang.Dictionary> {
+        if (slots.size() <= 1) {
+            return slots;
+        }
+        var low = [] as Lang.Array<Lang.Dictionary>;
+        var high = [] as Lang.Array<Lang.Dictionary>;
+        var pivot = slots[0];
+
+        for(var i = 1; i < slots.size(); i++) {
+            if ((pivot.get("id") as Lang.String).toNumber() > (slots[i].get("id") as Lang.String).toNumber()) {
+                low.add(slots[i]);
+            } else {
+                high.add(slots[i]);
+            }
+        }
+
+        var result = [] as Lang.Array<Lang.Dictionary>;
+        result.addAll(sortSlots(low));
+        result.add(pivot);
+        result.addAll(sortSlots(high));
+        return result;
     }
 }
