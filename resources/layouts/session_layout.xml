@@ -1,4 +1,4 @@
-<layout id="RaceLayout">
+<layout id="SessionLayout">
     <drawable id="gas" class="GasDrawable" />
     <label id="position" x="center" y="30%" color="Graphics.COLOR_WHITE" font="Gfx.FONT_SYSTEM_LARGE" justification="Graphics.TEXT_JUSTIFY_CENTER" />
     <label id="name" x="center" y="45%" color="Graphics.COLOR_WHITE" font="Gfx.FONT_SMALL" justification="Graphics.TEXT_JUSTIFY_CENTER" />

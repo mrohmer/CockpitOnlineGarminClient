@@ -1,10 +1,10 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class CarreraLiveRaceDelegate extends WatchUi.BehaviorDelegate {
-    private var view as CarreraLiveRaceView;
+class SessionDelegate extends WatchUi.BehaviorDelegate {
+    private var view as SessionView;
 
-    function initialize(_view as CarreraLiveRaceView) {
+    function initialize(_view as SessionView) {
         BehaviorDelegate.initialize();
         view = _view;
     }

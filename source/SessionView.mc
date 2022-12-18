@@ -6,7 +6,7 @@ import Toybox.Lang;
 import Toybox.Application.Properties;
 import Toybox.Timer;
 
-class CarreraLiveRaceView extends WatchUi.View {
+class SessionView extends WatchUi.View {
 
     private var page = 0;
     private var data as Lang.Dictionary or Null;
@@ -22,7 +22,7 @@ class CarreraLiveRaceView extends WatchUi.View {
 
     // Load your resources here
     function onLayout(dc as Dc) as Void {
-        setLayout(Rez.Layouts.RaceLayout(dc));
+        setLayout(Rez.Layouts.SessionLayout(dc));
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -148,9 +148,9 @@ class CarreraLiveRaceView extends WatchUi.View {
             var slot = getSlots()[i];
             var id = slot.get("id") as Lang.Number;
             if (!notifiers.hasKey(id)) {
-                notifiers.put(id, new CarreraLiveRaceNotifier());
+                notifiers.put(id, new SessionNotifier());
             }
-            var notifier = notifiers.get(id) as CarreraLiveRaceNotifier;
+            var notifier = notifiers.get(id) as SessionNotifier;
 
             var remainingGas = slot.get("remainingGas") as Lang.Float;
             if (remainingGas < 0.1) {
@@ -193,7 +193,7 @@ class CarreraLiveRaceView extends WatchUi.View {
     function makeRequest() as Void {
 
         var sessionName = Properties.getValue("sessionName");
-        var url = "https://carrera-live.rohmer.rocks/api/sessions/";
+        var url = "https://cockpit-online.rohmer.rocks/api/sessions/";
 
         var options = {                                             // set the options
             :method => Communications.HTTP_REQUEST_METHOD_GET,      // set HTTP method

@@ -2,7 +2,7 @@ import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class CarreraLiveApp extends Application.AppBase {
+class App extends Application.AppBase {
     private var _mainView;
 
     function initialize() {
@@ -19,9 +19,9 @@ class CarreraLiveApp extends Application.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() as Array<Views or InputDelegates>? {
-        _mainView = new CarreraLiveRaceView();
+        _mainView = new SessionView();
 
-        return [ self._mainView, new CarreraLiveRaceDelegate(_mainView) ] as Array<Views or InputDelegates>;
+        return [ self._mainView, new SessionDelegate(_mainView) ] as Array<Views or InputDelegates>;
     }
 
     function onSettingsChanged() {
@@ -31,6 +31,6 @@ class CarreraLiveApp extends Application.AppBase {
 
 }
 
-function getApp() as CarreraLiveApp {
-    return Application.getApp() as CarreraLiveApp;
+function getApp() as App {
+    return Application.getApp() as App;
 }

@@ -6,7 +6,7 @@ import Toybox.Lang;
 import Toybox.Application.Properties;
 import Toybox.Timer;
 
-class CarreraLiveRaceNotifier {
+class SessionNotifier {
     private var notified = false;
 
     function notify(skipVibration as Lang.Boolean) {
